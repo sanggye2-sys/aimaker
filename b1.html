@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel B1 Cell Extractor & Merger</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS (Excel 파싱 라이브러리) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 부드러운 스크롤바 디자인 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.2);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.4);
+        }
+        
+        /* 그라데이션 애니메이션 */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.05); }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+
+    <!-- 감각적인 백그라운드 디자인 -->
+    <div class="absolute inset-0 overflow-hidden -z-10">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-600/20 rounded-full filter blur-[120px] animate-pulse-subtle"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-teal-600/20 rounded-full filter blur-[120px] animate-pulse-subtle" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- 헤더 영역 -->
+    <header class="border-b border-slate-800/80 backdrop-blur-md bg-slate-950/50 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                    <!-- Excel 아이콘 대체 SVG -->
+                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-slate-100 tracking-tight">Excel B1 수집기</h1>
+                    <p class="text-xs text-slate-400">다중 엑셀 파일 데이터 통합 웹앱</p>
+                </div>
+            </div>
+            <div class="text-xs text-slate-400 font-mono bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full">
+                보안 안전 (클라이언트 기반 로컬 처리)
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 flex flex-col gap-6">
+        
+        <!-- 가이드 안내 카드 -->
+        <div class="bg-slate-900/60 border border-slate-800 backdrop-blur-xl rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <h2 class="text-sm font-semibold text-emerald-400">💡 사용 방법 안내</h2>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    업로드하는 모든 엑셀 파일의 <strong class="text-slate-100 underline decoration-emerald-500 underline-offset-4">첫 번째 시트 내 B1 셀</strong> 값을 가져옵니다. <br class="hidden sm:inline">
+                    가져온 데이터들은 하나의 목록으로 정돈되어 새로운 엑셀 파일(<span class="font-mono text-emerald-300">a.xlsx</span>)로 한 번에 다운로드할 수 있습니다.
+                </p>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-400 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 w-full md:w-auto">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>업로드 제한 없음</span>
+            </div>
+        </div>
+
+        <!-- 드래그 앤 드롭 파일 업로드 영역 -->
+        <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-emerald-500/80 bg-slate-900/40 hover:bg-emerald-950/10 rounded-3xl p-10 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300 group">
+            <input type="file" id="file-input" class="hidden" multiple accept=".xlsx, .xls">
+            
+            <div class="p-4 bg-slate-800/50 rounded-full mb-4 group-hover:scale-110 group-hover:bg-emerald-500/10 text-slate-400 group-hover:text-emerald-400 transition-all duration-300">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+            </div>
+            <p class="text-base font-semibold text-slate-200 mb-1 group-hover:text-emerald-300 transition-colors">엑셀 파일을 이곳에 끌어다 놓으세요</p>
+            <p class="text-xs text-slate-400 mb-4">또는 파일 탐색기에서 직접 선택하려면 클릭하세요</p>
+            <span class="px-3 py-1 bg-slate-800/60 text-[11px] text-slate-400 font-medium rounded-full border border-slate-700/80">
+                지원 파일 확장자: .xlsx, .xls
+            </span>
+        </div>
+
+        <!-- 업로드 진행바 및 알림 영역 -->
+        <div id="progress-container" class="hidden bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs">
+                <span id="progress-text" class="text-slate-300 font-medium">파일 읽는 중...</span>
+                <span id="progress-percentage" class="text-emerald-400 font-mono font-bold">0%</span>
+            </div>
+            <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-0 transition-all duration-300 ease-out"></div>
+            </div>
+        </div>
+
+        <!-- 데이터 결과 영역 -->
+        <div id="result-section" class="hidden flex-1 flex flex-col gap-4">
+            
+            <!-- 상태 요약 및 컨트롤러 -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+                        추출 결과 목록 
+                        <span id="file-count" class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-mono font-bold">0</span>
+                    </h3>
+                </div>
+                
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <!-- 초기화 버튼 -->
+                    <button onclick="resetApp()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-800 hover:bg-slate-900 text-xs font-semibold text-slate-400 hover:text-slate-200 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        모두 비우기
+                    </button>
+                    <!-- 다운로드 버튼 -->
+                    <button onclick="downloadMergedExcel()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-xs font-bold text-slate-950 transition shadow-lg shadow-emerald-500/10 active:scale-[0.98]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        a.xlsx로 다운로드
+                    </button>
+                </div>
+            </div>
+
+            <!-- 결과 테이블 카드 -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur-xl flex-1 flex flex-col min-h-[300px]">
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950/60 border-b border-slate-800 text-xs text-slate-400 font-semibold tracking-wider">
+                                <th class="py-3.5 px-5 w-16 text-center">번호</th>
+                                <th class="py-3.5 px-5">파일명</th>
+                                <th class="py-3.5 px-5">B1 셀 내용</th>
+                                <th class="py-3.5 px-5 w-24 text-center">상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-tbody" class="divide-y divide-slate-800/50 text-sm">
+                            <!-- 로우 목록이 렌더링되는 곳 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 푸터 영역 -->
+    <footer class="border-t border-slate-900 bg-slate-950/40 py-5">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+            <p>© 2026 Excel B1 Extractor Web App. All rights reserved.</p>
+            <p>본 서비스는 사용자의 엑셀 파일을 절대 임의의 외부 서버로 전송하지 않습니다.</p>
+        </div>
+    </footer>
+
+    <!-- 알림 메시지 토스트 오버레이 -->
+    <div id="toast-container" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4">
+        <!-- 알림 템플릿용 -->
+    </div>
+
+    <!-- JS 스크립트 -->
+    <script>
+        // 전역 상태 변수
+        let extractedData = []; // [{ id, filename, b1Value, status }]
+        
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const progressPercentage = document.getElementById('progress-percentage');
+        const resultSection = document.getElementById('result-section');
+        const resultTbody = document.getElementById('result-tbody');
+        const fileCountEl = document.getElementById('file-count');
+
+        // 드래그 앤 드롭 이벤트 리스너 등록
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-emerald-500', 'bg-emerald-950/10');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-emerald-500', 'bg-emerald-950/10');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-emerald-500', 'bg-emerald-950/10');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFiles(e.target.files);
+            }
+        });
+
+        // 파일 처리 핵심 로직
+        async function handleFiles(files) {
+            const excelFiles = Array.from(files).filter(file => {
+                const name = file.name.toLowerCase();
+                return name.endsWith('.xlsx') || name.endsWith('.xls');
+            });
+
+            if (excelFiles.length === 0) {
+                showToast("선택된 엑셀 파일(.xlsx, .xls)이 없습니다.", "error");
+                return;
+            }
+
+            // UI 진행 상태 표시
+            progressContainer.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            updateProgress(0, excelFiles.length);
+
+            // 데이터 수집 프로세스
+            for (let i = 0; i < excelFiles.length; i++) {
+                const file = excelFiles[i];
+                updateProgress(i + 1, excelFiles.length, file.name);
+                
+                try {
+                    const b1Value = await readB1Value(file);
+                    extractedData.push({
+                        id: extractedData.length + 1,
+                        filename: file.name,
+                        b1Value: b1Value,
+                        status: 'success'
+                    });
+                } catch (error) {
+                    console.error(error);
+                    extractedData.push({
+                        id: extractedData.length + 1,
+                        filename: file.name,
+                        b1Value: '읽기 실패 (에러)',
+                        status: 'error'
+                    });
+                }
+            }
+
+            // 로딩 종료 및 결과 화면 활성화
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+                resultSection.classList.remove('hidden');
+                renderTable();
+                showToast(`총 ${excelFiles.length}개의 파일 처리가 완료되었습니다.`, "success");
+            }, 600);
+        }
+
+        // 특정 파일의 B1 셀 읽어오는 프로미스 함수
+        function readB1Value(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        if (workbook.SheetNames.length === 0) {
+                            resolve('(시트 없음)');
+                            return;
+                        }
+
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        
+                        // B1 셀의 값을 가져옴
+                        const cellB1 = worksheet['B1'];
+                        const value = cellB1 ? cellB1.v : '';
+                        
+                        resolve(value === undefined || value === null || value === '' ? '(B1에 내용 없음)' : String(value));
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                reader.onerror = () => reject(new Error("파일을 읽어오지 못했습니다."));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // 진행률 표시 업데이트
+        function updateProgress(current, total, filename = '') {
+            const pct = Math.round((current / total) * 100);
+            progressBar.style.width = `${pct}%`;
+            progressPercentage.textContent = `${pct}%`;
+            if (filename) {
+                progressText.textContent = `[${current}/${total}] ${filename} 읽는 중...`;
+            } else {
+                progressText.textContent = `준비 중...`;
+            }
+        }
+
+        // 테이블 리렌더링
+        function renderTable() {
+            if (extractedData.length === 0) {
+                resultTbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-12 text-center text-slate-500">
+                            표시할 데이터가 없습니다. 파일을 먼저 추가해 주세요.
+                        </td>
+                    </tr>
+                `;
+                fileCountEl.textContent = "0";
+                return;
+            }
+
+            fileCountEl.textContent = extractedData.length;
+            resultTbody.innerHTML = extractedData.map(item => {
+                const isError = item.status === 'error';
+                const isEmpty = item.b1Value === '(B1에 내용 없음)';
+                let valueClass = 'text-slate-100 font-medium';
+                
+                if (isError) {
+                    valueClass = 'text-rose-400 font-normal italic';
+                } else if (isEmpty) {
+                    valueClass = 'text-slate-500 font-normal italic';
+                }
+
+                return `
+                    <tr class="hover:bg-slate-900/30 transition-colors">
+                        <td class="py-3.5 px-5 text-center font-mono text-xs text-slate-500">${item.id}</td>
+                        <td class="py-3.5 px-5 font-medium text-slate-200 max-w-xs truncate" title="${item.filename}">${item.filename}</td>
+                        <td class="py-3.5 px-5 ${valueClass}">${item.b1Value}</td>
+                        <td class="py-3.5 px-5 text-center">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                isError 
+                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' 
+                                : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            }">
+                                ${isError ? '오류' : '성공'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 병합된 단일 엑셀 파일 생성 및 다운로드 (a.xlsx)
+        function downloadMergedExcel() {
+            if (extractedData.length === 0) {
+                showToast("다운로드할 데이터가 존재하지 않습니다.", "error");
+                return;
+            }
+
+            try {
+                // 다운로드할 엑셀 포맷 가공
+                const excelRows = extractedData.map(item => ({
+                    '순번': item.id,
+                    '파일명': item.filename,
+                    'B1 셀 내용': item.b1Value
+                }));
+
+                const worksheet = XLSX.utils.json_to_sheet(excelRows);
+                
+                // 열 너비 자동 설정 스타일링
+                const colWidths = [
+                    { wch: 6 },  // 순번
+                    { wch: 35 }, // 파일명
+                    { wch: 45 }  // B1 셀 내용
+                ];
+                worksheet['!cols'] = colWidths;
+
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "B1 셀 수집 목록");
+
+                // 최종 통합된 파일 a.xlsx로 저장
+                XLSX.writeFile(workbook, "a.xlsx");
+                showToast("통합 파일 'a.xlsx'가 다운로드되었습니다.", "success");
+            } catch (err) {
+                console.error(err);
+                showToast("엑셀 파일 빌드 중 에러가 발생했습니다.", "error");
+            }
+        }
+
+        // 전체 초기화
+        function resetApp() {
+            extractedData = [];
+            fileInput.value = '';
+            resultSection.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            showToast("모든 업로드 기록과 데이터가 완전히 초기화되었습니다.", "success");
+        }
+
+        // 아름다운 커스텀 토스트 알림 메시지 출력
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-2xl border backdrop-blur-xl transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto ${
+                type === 'success' 
+                ? 'bg-slate-900/95 border-emerald-500/30 text-emerald-300' 
+                : 'bg-slate-900/95 border-rose-500/30 text-rose-300'
+            }`;
+
+            const icon = type === 'success' 
+                ? `<svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                : `<svg class="w-5 h-5 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+            toast.innerHTML = `
+                ${icon}
+                <span class="text-xs font-semibold leading-normal text-slate-200">${message}</span>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            // 들어오는 애니메이션 효과
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // 3.5초 후 제거 애니메이션 적용 및 삭제
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
