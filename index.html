@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Glassmorphic Calculator</title>
-    <!-- Tailwind CSS -->
+    <title>AI MAKERS - 학생 메이커 프로젝트 허브</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts (Inter & Poppins) -->
+    <!-- Lucide Icons (아이콘 라이브러리) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -17,15 +19,15 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        poppins: ['Poppins', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Noto Sans KR', 'sans-serif'],
                     },
                     colors: {
                         brand: {
-                            purple: '#8B5CF6',
-                            pink: '#EC4899',
-                            orange: '#F59E0B',
-                            teal: '#14B8A6',
+                            black: '#090a0f',
+                            dark: '#11131e',
+                            purple: '#7c3aed',
+                            cyan: '#06b6d4',
+                            green: '#10b981'
                         }
                     }
                 }
@@ -33,371 +35,201 @@
         }
     </script>
     <style>
-        /* 움직이는 배경 구름 애니메이션 */
-        @keyframes float-blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.95); }
-            100% { transform: translate(0px, 0px) scale(1); }
+        /* 은은하게 펄싱하는 배경 광원 애니메이션 */
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
         }
-        .animate-blob {
-            animation: float-blob 10s infinite ease-in-out;
+        .animate-float-1 {
+            animation: float-slow 10s infinite ease-in-out;
         }
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-        
-        /* 스크롤바 커스텀 */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(156, 163, 175, 0.3);
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(156, 163, 175, 0.5);
-        }
-
-        /* 쫀득한 버튼 눌림 애니메이션 */
-        .btn-press {
-            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-press:active {
-            transform: scale(0.92);
-            filter: brightness(0.85);
+        .animate-float-2 {
+            animation: float-slow 14s infinite ease-in-out 2s;
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-500 relative">
+<body class="bg-brand-black text-slate-100 font-sans min-h-screen flex flex-col justify-between relative overflow-x-hidden selection:bg-brand-cyan/30 selection:text-brand-cyan">
 
-    <!-- 몽환적인 움직이는 백그라운드 구름 -->
-    <div class="absolute inset-0 overflow-hidden -z-10">
-        <div class="absolute top-1/4 -left-20 w-80 h-80 bg-purple-600 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob"></div>
-        <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-pink-500 rounded-full mix-blend-screen filter blur-3xl opacity-25 animate-blob animation-delay-2000"></div>
+    <div class="absolute inset-0 overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-5%] w-[60%] h-[50%] bg-violet-600/10 rounded-full filter blur-[120px] animate-float-1"></div>
+        <div class="absolute bottom-[10%] right-[-5%] w-[55%] h-[50%] bg-cyan-600/10 rounded-full filter blur-[120px] animate-float-2"></div>
     </div>
 
-    <!-- 메인 컨테이너 -->
-    <div class="relative w-full max-w-[380px] p-4">
-        <!-- 계산기 글래스 카드 -->
-        <div class="relative bg-slate-950/40 dark:bg-slate-950/40 backdrop-blur-2xl border border-white/10 dark:border-white/5 rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden p-6 transition-all duration-300">
+    <header class="border-b border-white/5 backdrop-blur-xl bg-brand-black/40 sticky top-0 z-50">
+        <div class="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="p-2 bg-gradient-to-tr from-brand-purple to-brand-cyan rounded-xl shadow-lg shadow-brand-purple/20">
+                    <i data-lucide="cpu" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <span class="text-sm font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">AI MAKERS</span>
+                    <span class="block text-[10px] text-brand-cyan font-semibold tracking-widest uppercase">Student Showcase</span>
+                </div>
+            </div>
             
-            <!-- 상단 컨트롤 헤더 (테마, 소리, 히스토리 버튼) -->
-            <div class="flex items-center justify-between mb-6">
-                <!-- 히스토리 토글 -->
-                <button id="history-btn" onclick="toggleHistory()" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition btn-press" title="계산 기록">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </button>
-                
-                <!-- 로고/브랜드 영역 -->
-                <span class="font-poppins font-semibold text-sm tracking-wider bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">NEXUS</span>
-                
-                <div class="flex gap-2">
-                    <!-- 소리 설정 토글 -->
-                    <button id="sound-btn" onclick="toggleSound()" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition btn-press" title="소리 켜기/끄기">
-                        <svg id="sound-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
-                    </button>
-                    <!-- 테마 변경 토글 -->
-                    <button onclick="toggleTheme()" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition btn-press" title="테마 변경">
-                        <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    </button>
+            <span class="text-[11px] font-bold text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+                총 7개의 프로젝트
+            </span>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-xl w-full mx-auto px-4 py-8 space-y-8">
+        
+        <!-- 타이틀 히어로 섹션 -->
+        <div class="text-center space-y-3 py-4">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-[10px] font-bold rounded-full uppercase tracking-wider">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-pulse"></span>
+                We Make AI Services Real
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                우리가 만든 <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-cyan to-brand-purple">7개의 아이디어</span>
+            </h1>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                AI 메이커 동아리 학생들이 직접 기획하고 배포한 창의적인 AI 웹앱 모음집입니다. 카드를 눌러 직접 테스트해 보세요!
+            </p>
+        </div>
+
+        <div class="space-y-3.5">
+            
+            <!-- 링크 1 -->
+            <!-- 아래의 href="#" 부분에 해당 학생 웹사이트 주소(URL)를 적어주세요. 예: href="https://your-student-site.netlify.app" -->
+            <a href="#" target="_blank" class="group flex items-center justify-between p-4 bg-white/5 hover:bg-gradient-to-r hover:from-brand-purple/10 hover:to-brand-cyan/10 border border-white/5 hover:border-brand-purple/30 rounded-2xl transition-all duration-300">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-brand-purple/10 text-brand-purple rounded-xl group-hover:scale-105 transition-transform">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-100 group-hover:text-brand-cyan transition-colors">AI 감성 일기 분석기</span>
+                            <span class="text-[9px] px-1.5 py-0.2 bg-white/10 text-slate-300 rounded-md font-medium">by 김민준</span>
+                        </div>
+                        <span class="block text-[11px] text-slate-400 leading-normal">오늘 있었던 하루를 적으면 감정 패턴을 분석해 주는 다이어리</span>
+                    </div>
                 </div>
-            </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+            </a>
 
-            <!-- 디스플레이 영역 -->
-            <div class="mb-6 flex flex-col items-end justify-end px-3 py-4 bg-slate-900/40 rounded-3xl border border-white/5 shadow-inner">
-                <!-- 이전 계산 수식 -->
-                <div id="sub-display" class="text-sm font-medium text-slate-400/80 min-h-[20px] tracking-wide font-poppins text-right w-full overflow-hidden whitespace-nowrap overflow-ellipsis"></div>
-                <!-- 실시간/최종 결과값 -->
-                <div id="display" class="text-4xl font-bold text-white tracking-normal font-poppins text-right w-full mt-1 overflow-x-auto whitespace-nowrap py-1">0</div>
-            </div>
-
-            <!-- 키패드 레이아웃 -->
-            <div class="grid grid-cols-4 gap-3.5">
-                <!-- 1행: 보조기능 -->
-                <button onclick="clearDisplay()" class="btn-press bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 p-5 rounded-2xl font-semibold text-lg flex items-center justify-center">C</button>
-                <button onclick="appendFunction('pow')" class="btn-press bg-white/5 hover:bg-white/10 text-purple-400 p-5 rounded-2xl font-medium text-lg flex items-center justify-center">x²</button>
-                <button onclick="appendFunction('sqrt')" class="btn-press bg-white/5 hover:bg-white/10 text-purple-400 p-5 rounded-2xl font-medium text-lg flex items-center justify-center">√</button>
-                <button onclick="appendOperator('/')" class="btn-press bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 p-5 rounded-2xl font-bold text-xl flex items-center justify-center">÷</button>
-
-                <!-- 2행: 숫자 7,8,9, 곱하기 -->
-                <button onclick="appendNumber('7')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">7</button>
-                <button onclick="appendNumber('8')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">8</button>
-                <button onclick="appendNumber('9')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">9</button>
-                <button onclick="appendOperator('*')" class="btn-press bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 p-5 rounded-2xl font-bold text-xl flex items-center justify-center">×</button>
-
-                <!-- 3행: 숫자 4,5,6, 빼기 -->
-                <button onclick="appendNumber('4')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">4</button>
-                <button onclick="appendNumber('5')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">5</button>
-                <button onclick="appendNumber('6')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">6</button>
-                <button onclick="appendOperator('-')" class="btn-press bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 p-5 rounded-2xl font-bold text-xl flex items-center justify-center">−</button>
-
-                <!-- 4행: 숫자 1,2,3, 더하기 -->
-                <button onclick="appendNumber('1')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">1</button>
-                <button onclick="appendNumber('2')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">2</button>
-                <button onclick="appendNumber('3')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">3</button>
-                <button onclick="appendOperator('+')" class="btn-press bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 p-5 rounded-2xl font-bold text-xl flex items-center justify-center">+</button>
-
-                <!-- 5행: 백스페이스, 0, 소수점, 등호 -->
-                <button onclick="deleteLast()" class="btn-press bg-white/5 hover:bg-white/10 text-slate-300 p-5 rounded-2xl text-lg flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414A2 2 0 0010.828 19H20a2 2 0 002-2V7a2 2 0 00-2-2h-9.172a2 2 0 00-1.414.586L3 12z"></path></svg>
-                </button>
-                <button onclick="appendNumber('0')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">0</button>
-                <button onclick="appendNumber('.')" class="btn-press bg-white/5 hover:bg-white/10 text-slate-200 p-5 rounded-2xl font-medium text-lg">.</button>
-                <button onclick="calculate()" class="btn-press bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white p-5 rounded-2xl font-bold text-xl flex items-center justify-center shadow-lg shadow-purple-500/20">=</button>
-            </div>
-
-            <!-- 계산 기록 패널 (슬라이드 오버레이) -->
-            <div id="history-panel" class="absolute inset-x-0 bottom-0 top-[60px] bg-slate-950/95 backdrop-blur-xl border-t border-white/10 rounded-t-[2rem] transform translate-y-full transition-transform duration-300 ease-out z-20 flex flex-col p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-poppins font-semibold text-white text-base">계산 기록</h3>
-                    <button onclick="clearHistory()" class="text-xs text-rose-400 hover:text-rose-300 transition px-2.5 py-1 rounded bg-rose-500/10 border border-rose-500/20">전체 삭제</button>
+            <!-- 링크 2 -->
+            <a href="#" target="_blank" class="group flex items-center justify-between p-4 bg-white/5 hover:bg-gradient-to-r hover:from-brand-purple/10 hover:to-brand-cyan/10 border border-white/5 hover:border-brand-purple/30 rounded-2xl transition-all duration-300">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-brand-cyan/10 text-brand-cyan rounded-xl group-hover:scale-105 transition-transform">
+                        <i data-lucide="music" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-100 group-hover:text-brand-cyan transition-colors">감성 작사 AI (뮤즈)</span>
+                            <span class="text-[9px] px-1.5 py-0.2 bg-white/10 text-slate-300 rounded-md font-medium">by 이서연</span>
+                        </div>
+                        <span class="block text-[11px] text-slate-400 leading-normal">간단한 상황 키워드만 던져주면 장르별 멜로디 가사를 쓰는 도구</span>
+                    </div>
                 </div>
-                <!-- 기록 목록 -->
-                <div id="history-list" class="flex-1 overflow-y-auto space-y-3.5 pr-1 text-sm font-poppins">
-                    <!-- 기록 항목들이 생성되는 곳 -->
-                    <div class="text-slate-500 text-center py-10">이전 계산 기록이 없습니다.</div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+            </a>
+
+            <!-- 링크 3 -->
+            <a href="#" target="_blank" class="group flex items-center justify-between p-4 bg-white/5 hover:bg-gradient-to-r hover:from-brand-purple/10 hover:to-brand-cyan/10 border border-white/5 hover:border-brand-purple/30 rounded-2xl transition-all duration-300">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-brand-green/10 text-brand-green rounded-xl group-hover:scale-105 transition-transform">
+                        <i data-lucide="languages" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-100 group-hover:text-brand-cyan transition-colors">포켓 롤플레잉 영단어</span>
+                            <span class="text-[9px] px-1.5 py-0.2 bg-white/10 text-slate-300 rounded-md font-medium">by 박우진</span>
+                        </div>
+                        <span class="block text-[11px] text-slate-400 leading-normal">외우기 어려운 영단어를 상황극 속에서 자연스럽게 대화하며 습득</span>
+                    </div>
                 </div>
-                <button onclick="toggleHistory()" class="mt-4 w-full bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-medium py-3 rounded-xl border border-white/5 transition active:scale-95">닫기</button>
-            </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+            </a>
+
+            <!-- 링크 4 -->
+            <a href="#" target="_blank" class="group flex items-center justify-between p-4 bg-white/5 hover:bg-gradient-to-r hover:from-brand-purple/10 hover:to-brand-cyan/10 border border-white/5 hover:border-brand-purple/30 rounded-2xl transition-all duration-300">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl group-hover:scale-105 transition-transform">
+                        <i data-lucide="palette" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-100 group-hover:text-brand-cyan transition-colors">데일리 AI 그림 일기</span>
+                            <span class="text-[9px] px-1.5 py-0.2 bg-white/10 text-slate-300 rounded-md font-medium">by 최지아</span>
+                        </div>
+                        <span class="block text-[11px] text-slate-400 leading-normal">오늘의 일과를 한 줄로 요약하면 따뜻한 일러스트로 그려주는 웹앱</span>
+                    </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+            </a>
+
+            <!-- 링크 5 -->
+            <a href="#" target="_blank" class="group flex items-center justify-between p-4 bg-white/5 hover:bg-gradient-to-r hover:from-brand-purple/10 hover:to-brand-cyan/10 border border-white/5 hover:border-brand-purple/30 rounded-2xl transition-all duration-300">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl group-hover:scale-105 transition-transform">
+                        <i data-lucide="timer" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-100 group-hover:text-brand-cyan transition-colors">스마트 소리 믹싱 타이머</span>
+                            <span class="text-[9px] px-1.5 py-0.2 bg-white/10 text-slate-300 rounded-md font-medium">by 정태오</span>
+                        </div>
+                        <span class="block text-[11px] text-slate-400 leading-normal">뽀모도로 학습법과 집중도를 높여주는 AI 음원 믹싱 타이머</span>
+                    </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+            </a>
+
+            <!-- 링크 6 -->
+            <a href="#" target="_blank" class="group flex items-center justify-between p-4 bg-white/5 hover:bg-gradient-to-r hover:from-brand-purple/10 hover:to-brand-cyan/10 border border-white/5 hover:border-brand-purple/30 rounded-2xl transition-all duration-300">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-sky-500/10 text-sky-400 rounded-xl group-hover:scale-105 transition-transform">
+                        <i data-lucide="contact-2" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-100 group-hover:text-brand-cyan transition-colors">AI 실시간 가상 면접관</span>
+                            <span class="text-[9px] px-1.5 py-0.2 bg-white/10 text-slate-300 rounded-md font-medium">by 윤아름</span>
+                        </div>
+                        <span class="block text-[11px] text-slate-400 leading-normal">자기소개서를 바탕으로 날카로운 질문과 피드백을 제공하는 스피치 봇</span>
+                    </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+            </a>
+
+            <!-- 링크 7 -->
+            <a href="#" target="_blank" class="group flex items-center justify-between p-4 bg-white/5 hover:bg-gradient-to-r hover:from-brand-purple/10 hover:to-brand-cyan/10 border border-white/5 hover:border-brand-purple/30 rounded-2xl transition-all duration-300">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl group-hover:scale-105 transition-transform">
+                        <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-left space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-slate-100 group-hover:text-brand-cyan transition-colors">날씨 & 소셜 무드 리포터</span>
+                            <span class="text-[9px] px-1.5 py-0.2 bg-white/10 text-slate-300 rounded-md font-medium">by 한승우</span>
+                        </div>
+                        <span class="block text-[11px] text-slate-400 leading-normal">실시간 기상 데이터와 사람들의 기분을 유쾌하게 브리핑해주는 리포트</span>
+                    </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all"></i>
+            </a>
 
         </div>
-    </div>
 
+        <!-- 하단 심플 배너 -->
+        <div class="p-5 bg-gradient-to-r from-brand-purple/20 to-brand-cyan/20 border border-white/5 rounded-2xl text-center space-y-1">
+            <h4 class="text-xs font-bold text-white">🚀 세상을 놀라게 할 메이커는 바로 당신입니다</h4>
+            <p class="text-[10px] text-slate-400">신규 메이커 가입 문의는 동아리 회장실 및 공식 채널로 언제든지 편하게 문의하세요.</p>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-white/5 bg-brand-black/80 py-6 text-center text-[10px] text-slate-500 space-y-1">
+        <p>© 2026 AI MAKERS (AI 메이커 동아리). All rights reserved.</p>
+        <p>상상을 코드로 현실로 구현하는 메이커들의 성지</p>
+    </footer>
+
+    <!-- JS 스크립트 -->
     <script>
-        // 전역 상태 변수
-        const display = document.getElementById('display');
-        const subDisplay = document.getElementById('sub-display');
-        const historyList = document.getElementById('history-list');
-        const historyPanel = document.getElementById('history-panel');
-        
-        let shouldResetDisplay = false;
-        let isSoundEnabled = true;
-        let calculationsHistory = [];
-
-        // 다크모드 시스템 자동 체크 및 기본값 설정
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-
-        // 테마 수동 변경 토글
-        function toggleTheme() {
-            playClickSound(300, 0.05); // 테마 변경시 알림 소리
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                document.body.className = "bg-slate-100 text-slate-800 font-sans min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-500 relative";
-            } else {
-                document.documentElement.classList.add('dark');
-                document.body.className = "bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-500 relative";
-            }
-        }
-
-        // 키 사운드 재생 기능 (웹 오디오 API 신디사이저 탑재 - 추가 리소스 없음)
-        function playClickSound(freq = 600, duration = 0.04) {
-            if (!isSoundEnabled) return;
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-
-                oscillator.type = 'sine'; // 소리가 튀지 않고 부드러움
-                oscillator.frequency.value = freq; 
-                
-                // 음량 감쇠 (틱 하는 촉각적 느낌 생성)
-                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + duration);
-            } catch (e) {
-                console.warn('Web Audio API 비활성화됨');
-            }
-        }
-
-        // 사운드 토글 관리
-        function toggleSound() {
-            isSoundEnabled = !isSoundEnabled;
-            const soundIcon = document.getElementById('sound-icon');
-            if (isSoundEnabled) {
-                soundIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>`;
-                playClickSound(800, 0.1);
-            } else {
-                soundIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>`;
-            }
-        }
-
-        // 숫자 및 글자 입력 처리
-        function appendNumber(num) {
-            playClickSound(550);
-            
-            if (display.textContent === '0' || shouldResetDisplay) {
-                if (num === '.') {
-                    display.textContent = '0.';
-                } else {
-                    display.textContent = num;
-                }
-                shouldResetDisplay = false;
-            } else {
-                if (num === '.' && display.textContent.includes('.')) return;
-                display.textContent += num;
-            }
-        }
-
-        // 연산자 처리
-        function appendOperator(op) {
-            playClickSound(620);
-            shouldResetDisplay = false;
-
-            const lastChar = display.textContent.slice(-1);
-            if (['+', '-', '*', '/'].includes(lastChar)) {
-                // 연산자 연속 입력시 기존 연산자 변경
-                display.textContent = display.textContent.slice(0, -1) + op;
-            } else {
-                display.textContent += op;
-            }
-        }
-
-        // 간이 수식/공학 기능 처리
-        function appendFunction(func) {
-            playClickSound(680);
-            const currentVal = parseFloat(display.textContent);
-            if (isNaN(currentVal)) return;
-
-            let result = 0;
-            let expr = '';
-
-            if (func === 'pow') {
-                result = Math.pow(currentVal, 2);
-                expr = `sqr(${currentVal})`;
-            } else if (func === 'sqrt') {
-                if (currentVal < 0) {
-                    display.textContent = '오류';
-                    return;
-                }
-                result = Math.sqrt(currentVal);
-                expr = `√(${currentVal})`;
-            }
-
-            // 부드러운 소수점 보정
-            result = fixFloatingPoint(result);
-            
-            subDisplay.textContent = expr;
-            display.textContent = result;
-            shouldResetDisplay = true;
-
-            // 기록 추가
-            addHistoryItem(`${expr} = ${result}`);
-        }
-
-        // 리셋 및 지우기
-        function clearDisplay() {
-            playClickSound(400, 0.08);
-            display.textContent = '0';
-            subDisplay.textContent = '';
-        }
-
-        function deleteLast() {
-            playClickSound(480);
-            if (display.textContent.length > 1) {
-                display.textContent = display.textContent.slice(0, -1);
-            } else {
-                display.textContent = '0';
-            }
-        }
-
-        // 메인 계산 연산
-        function calculate() {
-            playClickSound(750, 0.06);
-            let rawExpression = display.textContent;
-            
-            if (!rawExpression || rawExpression === '0') return;
-
-            // 마지막 글자가 연산자이면 제거
-            const lastChar = rawExpression.slice(-1);
-            if (['+', '-', '*', '/'].includes(lastChar)) {
-                rawExpression = rawExpression.slice(0, -1);
-            }
-
-            try {
-                // 부드러운 보정식 안전 연산 (단순 계산기 용도로 제한)
-                const sanitizedExpr = rawExpression.replace(/×/g, '*').replace(/÷/g, '/');
-                let result = eval(sanitizedExpr);
-                
-                result = fixFloatingPoint(result);
-
-                subDisplay.textContent = rawExpression + ' =';
-                display.textContent = result;
-                shouldResetDisplay = true;
-
-                // 히스토리에 기록 저장
-                addHistoryItem(`${rawExpression} = ${result}`);
-            } catch (err) {
-                display.textContent = 'Error';
-                subDisplay.textContent = '';
-                shouldResetDisplay = true;
-            }
-        }
-
-        // 부동 소수점 에러 방지 (예: 0.1 + 0.2 = 0.3000000004 방지)
-        function fixFloatingPoint(num) {
-            if (!Number.isInteger(num)) {
-                return parseFloat(num.toPrecision(12));
-            }
-            return num;
-        }
-
-        // 계산 기록 저장 기능
-        function addHistoryItem(item) {
-            calculationsHistory.unshift(item); // 최신 내역이 위로 오게 추가
-            if (calculationsHistory.length > 30) calculationsHistory.pop(); // 최대 30개 제한
-            renderHistory();
-        }
-
-        function renderHistory() {
-            if (calculationsHistory.length === 0) {
-                historyList.innerHTML = `<div class="text-slate-500 text-center py-10">이전 계산 기록이 없습니다.</div>`;
-                return;
-            }
-
-            historyList.innerHTML = calculationsHistory.map((item, index) => {
-                const parts = item.split(' = ');
-                return `
-                    <div class="p-3 bg-white/5 dark:bg-slate-900/60 rounded-xl border border-white/5 flex flex-col items-end gap-1 hover:bg-white/10 transition cursor-pointer" onclick="useHistoryValue('${parts[1]}')">
-                        <span class="text-xs text-slate-400 font-normal">${parts[0]}</span>
-                        <span class="text-sm font-bold text-purple-400">= ${parts[1]}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function clearHistory() {
-            playClickSound(300, 0.1);
-            calculationsHistory = [];
-            renderHistory();
-        }
-
-        function useHistoryValue(val) {
-            playClickSound(600);
-            display.textContent = val;
-            toggleHistory(); // 패널을 닫아 즉시 사용할 수 있도록 제공
-        }
-
-        function toggleHistory() {
-            playClickSound(500, 0.05);
-            const isClosed = historyPanel.classList.contains('translate-y-full');
-            if (isClosed) {
-                historyPanel.classList.remove('translate-y-full');
-            } else {
-                historyPanel.classList.add('translate-y-full');
-            }
-        }
+        // Lucide 아이콘 로드 및 렌더링
+        lucide.createIcons();
     </script>
 </body>
 </html>
